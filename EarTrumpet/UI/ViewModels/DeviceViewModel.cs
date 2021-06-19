@@ -5,6 +5,9 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Policy;
+using System.Windows.Input;
+using EarTrumpet.UI.Helpers;
 
 namespace EarTrumpet.UI.ViewModels
 {
@@ -26,6 +29,8 @@ namespace EarTrumpet.UI.ViewModels
         public string EnumeratorName => ((IAudioDeviceWindowsAudio)_device).EnumeratorName;
         public string InterfaceName => ((IAudioDeviceWindowsAudio)_device).InterfaceName;
         public ObservableCollection<IAppItemViewModel> Apps { get; }
+        
+        public ICommand ToggleAppList { get; } 
 
         public bool IsDisplayNameVisible
         {
@@ -40,6 +45,19 @@ namespace EarTrumpet.UI.ViewModels
             }
         }
 
+        public bool IsAppListVisible
+        {
+            get => _isAppListVisible;
+            set
+            {
+                if (_isAppListVisible != value)
+                {
+                    _isAppListVisible = value;
+                    RaisePropertyChanged(nameof(IsAppListVisible));
+                }
+            }
+        }
+        
         public DeviceIconKind IconKind
         {
             get => _iconKind;
@@ -58,6 +76,7 @@ namespace EarTrumpet.UI.ViewModels
         protected readonly WeakReference<DeviceCollectionViewModel> _parent;
         private bool _isDisplayNameVisible;
         private DeviceIconKind _iconKind;
+        private bool _isAppListVisible;
 
         public DeviceViewModel(DeviceCollectionViewModel parent, IAudioDeviceManager deviceManager, IAudioDevice device) : base(device)
         {
@@ -74,6 +93,8 @@ namespace EarTrumpet.UI.ViewModels
                 Apps.AddSorted(new AppItemViewModel(this, session), AppItemViewModel.CompareByExeName);
             }
 
+            ToggleAppList = new RelayCommand(() => IsAppListVisible = !IsAppListVisible);
+                
             UpdateMasterVolumeIcon();
         }
 

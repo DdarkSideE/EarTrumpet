@@ -7,6 +7,9 @@
              xmlns:resx="clr-namespace:EarTrumpet.Properties"
              xmlns:views="clr-namespace:EarTrumpet.UI.Views"
              IsTabStop="False">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
     <Grid Name="GridRoot">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -119,19 +122,26 @@
                                           PreviewTouchUp="TouchSlider_TouchUp"
                                           Style="{StaticResource {x:Type Slider}}"
                                           Value="{Binding Device.Volume, Mode=TwoWay}" />
-                        <TextBlock Grid.Column="2"
-                                   Style="{StaticResource DeviceVolumeTextStyle}"
-                                   Text="{Binding Device.Volume, Mode=OneWay}" />
+      
+                        <Button Grid.Column="2" Background="Transparent" 
+                                Command="{Binding Device.ToggleAppList}"
+                                Content="{Binding Device.Volume, Mode=OneWay}">
+                            <Button.Style>
+                                <Style BasedOn="{StaticResource AppToggleButton}" TargetType="{x:Type Button}" />
+                            </Button.Style>
+                        </Button>
                     </Grid>
                 </Grid>
             </Border>
         </ListViewItem>
-
+        
         <Border Grid.Row="1" Theme:Brush.Background=":=Background, Flyout:FlyoutBackground">
             <ListView Name="AppList"
                       Margin="{StaticResource VolumeAppListMargin}"
                       AutomationProperties.Name="{x:Static resx:Resources.AppsListAccessibleText}"
-                      ItemsSource="{Binding Device.Apps, Mode=OneWay}" />
+                      ItemsSource="{Binding Device.Apps, Mode=OneWay}" 
+                      Visibility="{Binding Device.IsAppListVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            </ListView>
         </Border>
     </Grid>
 </UserControl>
